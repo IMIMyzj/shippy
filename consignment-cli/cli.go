@@ -35,16 +35,6 @@ func parseFile(fileName string) (*pb.Consignment, error) {
 
 func main() {
 	cmd.Init()
-
-	// 连接到 gRPC 服务器
-	// conn, err := grpc.Dial(ADDRESS, grpc.WithInsecure())
-	// if err != nil {
-	// 	log.Fatalf("connect error: %v", err)
-	// }
-	// defer conn.Close()
-
-	// 初始化 gRPC 客户端
-	// client := pb.NewShippingServiceClient(conn)
 	client := pb.NewShippingServiceClient("go.micro.srv.consignment", microclient.DefaultClient)
 
 	// 在命令行中指定新的货物信息 json 文件

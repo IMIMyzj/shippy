@@ -58,38 +58,16 @@ func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest, resp 
 }
 
 func main() {
-	// ----Use grpc----//
-	// server :=
-	// listener, err := net.Listen("tcp", PORT)
-	// if err != nil {
-	// 	log.Fatalf("failed to listen: %v", err)
-	// }
-	// log.Printf("listen on: %s\n", PORT)
-
-	// server := grpc.NewServer()
-	//--------------------//
-
 	// ----Use go-micro----//
 	server := micro.NewService(
 		micro.Name("go.micro.srv.consignment"),
 		micro.Version("latest"),
 	)
 	server.Init()
-	//--------------------//
 
 	repo := Repository{}
 	pb.RegisterShippingServiceHandler(server.Server(), &service{repo})
-
-	// ----Use grpc----//
-	// pb.RegisterShippingServiceServer(server, &service{repo})
-	// if err := server.Serve(listener); err != nil {
-	// 	log.Fatalf("failed to serve: %v", err)
-	// }
-	// ---------------//
-
-	// ----Use go-micro----//
 	if err := server.Run(); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-	//--------------------//
 }
