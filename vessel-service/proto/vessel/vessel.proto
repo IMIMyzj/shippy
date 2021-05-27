@@ -20,7 +20,7 @@ message Vessel{
 
 // 等待运送的货物
 message Specification{
-    int32 capacity = 1;         // 容量
+    int32 capacity = 1;         // 容量(集装箱个数)
     int32 max_weight = 2;       // 重量
 }
 

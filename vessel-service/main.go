@@ -43,7 +43,7 @@ func (s *service) FindAvailable(ctx context.Context, spec *pb.Specification, res
 }
 
 func main() {
-	// 写下停留在钢构的货船
+	// 写下停留在港口的货船
 	vessels := []*pb.Vessel{
 		{Id: "vessel001", Name: "Boaty McBoatface", MaxWeight: 200000, Capacity: 500},
 	}
