@@ -9,13 +9,11 @@ import (
 	"os"
 	pb "shippy/consignment-service/proto/consignment"
 
-	microclient "github.com/micro/go-micro/client"
-
-	"github.com/micro/micro/cmd"
+	"github.com/micro/go-micro"
 )
 
 const (
-	ADDRESS           = "localhost:50051"
+	// ADDRESS           = "localhost:50051"
 	DEFAULT_INFO_FILE = "consignment.json"
 )
 
@@ -34,8 +32,10 @@ func parseFile(fileName string) (*pb.Consignment, error) {
 }
 
 func main() {
-	cmd.Init()
-	client := pb.NewShippingServiceClient("go.micro.srv.consignment", microclient.DefaultClient)
+	service := micro.NewService(micro.Name("go.micro.srv.consignment"))
+	service.Init()
+
+	client := pb.NewShippingServiceClient("go.micro.srv.consignment", service.Client())
 
 	// 在命令行中指定新的货物信息 json 文件
 	infoFile := DEFAULT_INFO_FILE
@@ -58,6 +58,7 @@ func main() {
 
 	// 新货物是否托运成功
 	log.Printf("created: %t", resp.Created)
+	log.Printf("resp: %v", resp)
 
 	// 列出现在所有托运的货物
 	resp, err = client.GetConsignments(context.Background(), &pb.GetRequest{})

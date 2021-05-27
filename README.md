@@ -1,4 +1,4 @@
-# Golange微服务
+# Golang微服务
 
 ### Golang微服务(一)
 
@@ -52,13 +52,42 @@
   - message
     - 定义所有rpc接口中输入和输出用到的结构，以及实现它们过程中的结构
 - <font color=fc5404> **rpc服务：使用go-micro【需要修改go.mod---->https://www.icode9.com/content-4-729280.html，否则直接按照教程会出错】**</font>
-  - ==不用定义服务端口==
+  - 不用定义服务端口
   - 仓库接口实现相同
   - 定义微服务的service中把pb.Response返回值放到了函数的入参里
   - main：启动网络监听，启动微服务
-    - 微服务注册流程：`server :=     micro.NewService(…Option)`
-    - 初始化：`server.Init()`
-    - 为微服务注册数据体：`pb.RegisterShippingServiceHandler(server.Server(), &service的interface的struct)`
-    - 启动：`server.run()`
+    - 微服务注册流程并初始化
+    
+        ```go 
+        server := micro.NewService(…Option)
+        server.Init()
+        ```
+    
+    - 为微服务注册数据体
+    
+      ```go
+      pb.RegisterShippingServiceHandler(server.Server(), &service的interface的struct)
+      ```
+    
+    - 启动
+    
+      ```go
+      server.run()
+      ```
 - <font color=f7a440> **在client的代码中远程调用server内定义的服务**</font>
-  - 
+  
+  - 先定义客户端对应的服务并初始化
+  
+    ```go
+    service := micro.NewService(micro.Name("go.micro.srv.consignment"))
+    service.Init()
+    ```
+  
+  - 注册为service的客户端
+  
+    ```go
+    client := pb.NewShippingServiceClient("go.micro.srv.consignment", service.Client())
+    ```
+  
+  - 接下去就可以调用相关服务端函数
+
