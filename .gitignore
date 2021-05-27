@@ -1,4 +1,5 @@
 # 可运行文件
 consignment-cli/consignment-cli
-consignment-service/consignment-cli
+consignment-service/consignment-service
+vessel-service/vessel-service
 
