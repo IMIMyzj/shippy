@@ -2,4 +2,5 @@
 consignment-cli/consignment-cli
 consignment-service/consignment-service
 vessel-service/vessel-service
-
+user-service/user-service
+user-cli/user-cli
