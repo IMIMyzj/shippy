@@ -114,10 +114,10 @@
 
 - <font color=e93b81>**consignment-service | consignment-cli  | vessel-service**</font>
 
-  - 功能描述
+  - **功能描述**
     - 这三个是一起的，两个服务端一个客户端
     - consignment客户端向consignment服务端请求托运服务，consignment服务端向vessel服务端请求货轮服务
-  - 注意点
+  - **注意点**
     - 依赖的数据库是mongoDB，mongoDB是用database/collection来存储数据的，在docker-compose.yaml中定义了上面的服务以其为依赖，因此会先启动它。打开mongoDB的会话在repository.go中的collection()接口上，直接定位到collection进行增查
 
 - <font color=fc5404> **user-service | user-cli**</font>
