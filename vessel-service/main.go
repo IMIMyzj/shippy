@@ -1,65 +1,52 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
+	"os"
 	pb "shippy/vessel-service/proto/vessel"
 
 	"github.com/micro/go-micro"
-	"github.com/pkg/errors"
 )
 
-type Repository interface {
-	FindAvailable(*pb.Specification) (*pb.Vessel, error)
-}
-
-type VesselReposity struct {
-	vessels []*pb.Vessel
-}
-
-// 接口实现
-func (repo *VesselReposity) FindAvailable(spec *pb.Specification) (*pb.Vessel, error) {
-	// 选择最近一条容量和载重都符合的货轮
-	for _, v := range repo.vessels {
-		if v.Capacity >= spec.Capacity && v.MaxWeight >= spec.MaxWeight {
-			fmt.Printf("Find vessel: %s\n", v.Id)
-			return v, nil
-		}
-	}
-	return nil, errors.New("No vessel can be use")
-}
-
-// 定义货船服务
-type service struct {
-	repo Repository
-}
-
-func (s *service) FindAvailable(ctx context.Context, spec *pb.Specification, resp *pb.Response) error {
-	v, err := s.repo.FindAvailable(spec)
-	if err != nil {
-		return err
-	}
-	resp.Vessel = v
-	return nil
-}
+const (
+	DEFAULT_HOST = "localhost:27017"
+)
 
 func main() {
-	// 写下停留在港口的货船
-	vessels := []*pb.Vessel{
-		{Id: "vessel001", Name: "Boaty McBoatface", MaxWeight: 200000, Capacity: 500},
+
+	host := os.Getenv("DB_HOST")
+	if host == "" {
+		host = DEFAULT_HOST
 	}
-	repo := &VesselReposity{vessels}
+	session, err := CreateSession(host)
+	defer session.Close()
+	if err != nil {
+		log.Fatalf("create session error: %v\n", err)
+	}
+
+	// 停留在港口的货船，先写死
+	repo := &VesselRepository{session.Copy()}
+	CreateDummyData(repo)
 	server := micro.NewService(
 		micro.Name("go.micro.srv.vessel"),
 		micro.Version("latest"),
 	)
 	server.Init()
 
-	// 注册服务端的API
-	pb.RegisterVesselServiceHandler(server.Server(), &service{repo})
+	// 将实现服务端的 API 注册到服务端
+	pb.RegisterVesselServiceHandler(server.Server(), &handler{session})
+
 	if err := server.Run(); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+}
 
+func CreateDummyData(repo Repository) {
+	defer repo.Close()
+	vessels := []*pb.Vessel{
+		{Id: "vessel001", Name: "Boaty McBoatface", MaxWeight: 200000, Capacity: 500},
+	}
+	for _, v := range vessels {
+		repo.Create(v)
+	}
 }

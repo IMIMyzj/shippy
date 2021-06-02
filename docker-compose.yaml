@@ -27,6 +27,9 @@ services:
         environment:
             MICRO_ADRESS: ":50051"
             MICRO_REGISTRY: "mdns"
+            DB_HOST: "datastore:27017"
+        depends_on: 
+            - datastore
 
     datastore:
         image: mongo
