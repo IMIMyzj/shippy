@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	pb "shippy/vessel-service/proto/vessel"
 
@@ -22,6 +23,7 @@ func (repo *VesselReposity) FindAvailable(spec *pb.Specification) (*pb.Vessel, e
 	// 选择最近一条容量和载重都符合的货轮
 	for _, v := range repo.vessels {
 		if v.Capacity >= spec.Capacity && v.MaxWeight >= spec.MaxWeight {
+			fmt.Printf("Find vessel: %s\n", v.Id)
 			return v, nil
 		}
 	}

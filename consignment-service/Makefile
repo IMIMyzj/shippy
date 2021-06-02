@@ -8,7 +8,7 @@ build:
 
 # 根据当前目录下的Dockerfile生成consignment-service镜像
 # 将程序执行文件以及所需的run-time环境打包成一个镜像，以后在docker run这个镜像就可以
-	docker build -t consignment-service .
+#	docker build -t consignment-service .
 
 run:
 # 在Docker debian容器的50001端口上运行服务
