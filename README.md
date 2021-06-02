@@ -154,4 +154,8 @@
       ```
 
     - **还有一个没解决的问题**：就是micro.Flags的解析，从命令行解析出的数据都是空的，不知道为什么，所以先写死了value
+  
+- 总体注意点
 
+  - 修改完代码后要make build生成新的二进制文件，再用docker-compose build去利用Dockerfile生成images
+  - 在最外层文件夹写了个Makefile是为了方便一些重构和运行操作
