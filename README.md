@@ -38,15 +38,12 @@
 
 #### 使用技术栈
 
-- [x] go
-
-- [x] go-micro
+- [x] ...
 
 - [x] Docker
 
-- [x] Makefile
-
   
+
 
 #### 整体流程
 
@@ -103,9 +100,8 @@
 
 #### 使用技术栈
 
-- [x] go
-- [x] go-micro
-- [x] Docker  | Docker-compose | Dockerfile
+- [x] ...
+- [x] Docker-compose | Dockerfile
 - [x] mongoDB  |  postgres
 
 
@@ -159,3 +155,33 @@
 
   - 修改完代码后要make build生成新的二进制文件，再用docker-compose build去利用Dockerfile生成images
   - 在最外层文件夹写了个Makefile是为了方便一些重构和运行操作
+
+----
+
+### Golang微服务(四)
+
+#### 使用技术栈
+
+- [x] JWT
+
+
+
+#### 整体流程
+
+- 在user-service中，使用哈希加密用户密码再存储，加密结果如下一堆字符串
+
+  ```shell
+  userServiceDB=# select * from users
+  userServiceDB-# where email = 'meloneater@gmail.com';
+                    id                  |  ... |                           password     
+  --------------------------------------+  ... +----------------------------------------
+   32c67401-2688-4e2d-b05a-f4e8506974cd |  ... | $2a$10$tKWwVgHMa9UQbp0ble/5juraBYrrIYpOy/zHOiX0jpGoogugJuP.u
+   bea161a2-5ab0-405a-a7f3-5c90c01f6a6b |  ... | $2a$10$0QTpmhNx4U215/XZEzznnuFi75snT0TXrW9kjI78XlB6/MiylrCmy 
+   8f689475-5204-452a-a066-2450f286a695 |  ... | $2a$10$niGsFowPHLgRBrp5TKzEsOrQd/8D/AU0HPnMgDB5rDGTNYtqigs2q
+   353cb13d-27a8-4a7a-8e3e-d369a60bd572 |  ... | $2a$10$fwMsVMi.8MZBXKsxDPSppeeMadY7wwZ1M25Bbk.q5wHiUeSbUPOP. 
+   d8d8c146-0557-43a6-89a4-74350faa5445 |  ... | $2a$10$n3n8ACX7oJPyHhOr4L624eLAfq1/ItFEPvUmdRu8mmNAe0B4j5ZMq 
+  (5 rows)
+  
+  ```
+
+- JWT加密整个用户信息，对应tocken_service.go里面的Encode函数

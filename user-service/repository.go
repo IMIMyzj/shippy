@@ -11,7 +11,7 @@ type Repository interface {
 	Get(id string) (*pb.User, error)
 	GetAll() ([]*pb.User, error)
 	Create(*pb.User) error
-	GetByEmailAndPassword(*pb.User) (*pb.User, error)
+	GetByEmail(email string) (*pb.User, error)
 }
 
 type UserRepository struct {
@@ -51,10 +51,13 @@ func (repo *UserRepository) Create(u *pb.User) error {
 	return nil
 }
 
-// 得到email和密码
-func (repo *UserRepository) GetByEmailAndPassword(u *pb.User) (*pb.User, error) {
-	if err := repo.db.Find(&u).Error; err != nil {
+// 根据email查找用户,不能传入密码数据，否则会被改成数据库内部的，对比哈希密码的时候就会对比相同的string而报错
+func (repo *UserRepository) GetByEmail(email string) (*pb.User, error) {
+	user := &pb.User{}
+
+	if err := repo.db.Where("email = ?", email).Find(user).Error; err != nil {
 		return nil, err
 	}
-	return u, nil
+
+	return user, nil
 }
