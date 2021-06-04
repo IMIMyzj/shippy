@@ -185,3 +185,63 @@
   ```
 
 - JWT加密整个用户信息，对应tocken_service.go里面的Encode函数
+
+- 调用流程
+
+  - 打开vessel-service, consignment-service, user-service
+
+  - 打开user-cli，存储用户信息，并且获取到JWT加密信息
+
+  - 打开consignment-cli，调用.json文件的货物信息，使用JWT加密用户【会调用tocken_service.go里面Decode函数】。这步目前只需要验证加密用户是否存在于数据库中，而不用管用户和.json内的用户信息匹配。
+
+    ```shell
+    # 这部分是错误密钥111
+    meloneater@meloneater-ubuntu:~/gopath/src/shippy$ docker-compose run consignment-cli consignment.json 111
+    Creating shippy_consignment-cli_run ... done
+    2021-06-04 04:01:44.413765 I | infoFile: 
+    consignment.json
+    2021-06-04 04:01:44.413788 I | token: 
+    111
+    
+    2021-06-04 04:01:49.514734 I | create consignment error: {"id":"go.micro.client","code":408,"detail":"call timeout: context deadline exceeded","status":"Request Timeout"}
+    ERROR: 1
+    
+    # 这部分是正确JWT密钥
+    meloneater@meloneater-ubuntu:~/gopath/src/shippy$ docker-compose run consignment-cli consignment.json eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VyIjp7ImlkIjoiN2ZmYzliMjEtNjZjZi00MmEwLWE2OTItOTU4NmNjMzU3NTM5IiwibmFtZSI6Im1lbG9uZWF0ZXIiLCJjb21wYW55Ijoiemp1IiwiZW1haWwiOiJtZWxvbmVhdGVyQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJhJDEwJHEuYmR5WFduNFdMNEMydmY3UVl3Q3UvYXVHL25mVDZreWlZSzhQaHdxTllTOTh0NW8zUnNTIn0sImV4cCI6MTYyMzAzODQ2MiwiaXNzIjoiZ28ubWljcm8uc3J2LnVzZXIifQ.TDc6ErRg9Qyh_M6j9nP4NpIyGm2OJqt7-eeTn-ZGtok
+    Creating shippy_consignment-cli_run ... done
+    2021-06-04 04:02:13.990956 I | infoFile: 
+    consignment.json
+    2021-06-04 04:02:13.990986 I | token: 
+    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VyIjp7ImlkIjoiN2ZmYzliMjEtNjZjZi00MmEwLWE2OTItOTU4NmNjMzU3NTM5IiwibmFtZSI6Im1lbG9uZWF0ZXIiLCJjb21wYW55Ijoiemp1IiwiZW1haWwiOiJtZWxvbmVhdGVyQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJhJDEwJHEuYmR5WFduNFdMNEMydmY3UVl3Q3UvYXVHL25mVDZreWlZSzhQaHdxTllTOTh0NW8zUnNTIn0sImV4cCI6MTYyMzAzODQ2MiwiaXNzIjoiZ28ubWljcm8uc3J2LnVzZXIifQ.TDc6ErRg9Qyh_M6j9nP4NpIyGm2OJqt7-eeTn-ZGtok
+    
+    2021-06-04 04:02:14.268047 I | created: true
+    2021-06-04 04:02:14.285920 I | description:"This is a test consignment" weight:55000 containers:<customer_id:"cust001" origin:"Manchester, United Kingdom" user_id:"user001" > containers:<customer_id:"cust002" origin:"Derby, United Kingdom" user_id:"user001" > containers:<customer_id:"cust005" origin:"Sheffield, United Kingdom" user_id:"user001" > vessel_id:"vessel001" 
+    ```
+
+- <font color=red>目前有个BUG：错误的密钥会让user-service停止服务。</font>
+
+  原因是在token_service.go的Decode()的ParseWithClaims()函数解析JWT密钥的时候，当输入的密钥不符合JWT格式的XXX.XXX.XXX, 那么函数在取第二部分claims的时候就会访问不对的空间
+
+  ```shell
+  meloneater@meloneater-ubuntu:~/gopath/src/shippy/user-service$ docker-compose run user-service
+  Creating shippy_user-service_run ... done
+  Host:database	port:5432	User:userService	Password:12345	DbName:userServiceDB
+  &{RWMutex:{w:{state:0 sema:0} writerSem:0 readerSem:0 readerCount:0 readerWait:0} Value:<nil> Error:<nil> RowsAffected:0 db:0xc0005280c0 blockGlobalUpdate:false logMode:0 logger:{LogWriter:0xc0001a1d60} search:<nil> values:{mu:{state:0 sema:0} read:{v:<nil>} dirty:map[] misses:0} parent:0xc00011c1a0 callbacks:0x1e80920 dialect:0xc0001a4220 singularTable:false nowFuncOverride:<nil>}
+  err: <nil>
+  2021-06-04 04:10:14.858426 I | Transport [http] Listening on [::]:36955
+  2021-06-04 04:10:14.858557 I | Broker [http] Connected to [::]:44995
+  2021-06-04 04:10:14.858950 I | Registry [mdns] Registering node: go.micro.srv.user-ddba6942-84f0-441f-858e-452c13d8296a
+  panic: runtime error: invalid memory address or nil pointer dereference   # 错误显示在这
+  [signal SIGSEGV: segmentation violation code=0x1 addr=0x30 pc=0x12ea1b8]
+  ```
+
+  ```shell
+  # 错误的JWT token输入格式
+  meloneater@meloneater-ubuntu:~/gopath/src/shippy$ docker-compose run consignment-cli consignment.json 111
+  
+  # 正确的JWT token输入格式
+  meloneater@meloneater-ubuntu:~/gopath/src/shippy$ docker-compose run consignment-cli consignment.json 111.111.111
+  
+  ```
+
+- 需要理解的问题：go-micro的上下文到底是什么？

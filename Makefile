@@ -10,3 +10,13 @@ user-service-rebuild:
 	docker container prune
 	docker rmi shippy_user-service
 	docker-compose build user-service
+
+consignment-service-rebuild:
+	docker container prune
+	docker rmi shippy_consignment-service
+	docker-compose build consignment-service
+
+consignment-cli-rebuild:
+	docker container prune
+	docker rmi shippy_consignment-cli
+	docker-compose build consignment-cli
