@@ -38,12 +38,10 @@ services:
             - 50053:50051
         environment:
             MICRO_ADRESS: ":50051"
-            MICRO_BROKER: "nats"
-            MICRO_BROKER_ADDRESS: "0.0.0.0:4222"
             MICRO_REGISTRY: "mdns"
             DB_NAME: "userServiceDB"
             DB_HOST: "database"
-            DB_PORT: "5432"
+            DB_PORT: "3306"
             DB_USER: "userService"
             DB_PASSWORD: "12345"
         depends_on:
@@ -56,11 +54,10 @@ services:
 
     email-service:
         build: ./email-service
-        network_mode: "host"
+        ports: 
+            - 50054:50051
         environment: 
             MICRO_REGISTRY: "mdns"
-            MICRO_BROKER: "nats"
-            MICRO_BROKER_ADDRESS: "0.0.0.0:4222"
     
     nats:
         image: nats

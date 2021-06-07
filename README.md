@@ -252,8 +252,25 @@
 
 #### 使用技术栈
 
-- [x] NATS
+- [x] pubsub
+- [x] MySQL
 
 
 
 #### 整体流程
+
+- 主要对email-service/user-service/user-cli进行解耦，使用micro自带的pubsub
+
+  - cli要根据topic进行publish
+  - server要根据topic进行subscriber
+  - 因为用了pubsub所以不需要再使用NATS，主要就是要掌握下pubsub的写法，具体参考https://github.com/asim/go-micro/tree/master/examples/pubsub
+
+- 使用MySQL
+
+  - 还是需要连接两次，但是出现一个现象：**快速连接情况下可能来两次连接都不够，但是如果第二次运行隔久一点时间，就一定能两次成功**
+    - 猜测原因：MySQL完整建立服务需要一段时间
+
+- 最终结果
+
+  ![2021-06-07 22-50-43 的屏幕截图](/home/meloneater/gopath/src/shippy/img/2021-06-07 22-50-43 的屏幕截图.png)
+

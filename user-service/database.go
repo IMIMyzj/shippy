@@ -19,6 +19,7 @@ func CreateConnection() (*gorm.DB, error) {
 	db, err := gorm.Open(
 		"mysql",
 		fmt.Sprintf(
+			// "user:pass@tcp(ip:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 			"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			user, password, host, port, dbName,
 		),
