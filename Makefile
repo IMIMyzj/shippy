@@ -20,3 +20,8 @@ consignment-cli-rebuild:
 	docker container prune
 	docker rmi shippy_consignment-cli
 	docker-compose build consignment-cli
+
+email-service-rebuild:
+	docker container prune
+	docker rmi shippy_email-service
+	docker-compose build email-service

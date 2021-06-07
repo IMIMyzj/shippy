@@ -34,36 +34,50 @@ services:
 
     user-service:
         build: ./user-service
-        ports:
-            - 50053:50051
+        network_mode: "host"
+        # ports:
+        #     - 50053:50051
         environment:
             MICRO_ADRESS: ":50051"
+            MICRO_BROKER: "nats"
+            MICRO_BROKER_ADDRESS: "0.0.0.0:4222"
             MICRO_REGISTRY: "mdns"
             DB_NAME: "userServiceDB"
             DB_HOST: "database"
             DB_PORT: "5432"
             DB_USER: "userService"
             DB_PASSWORD: "12345"
-        depends_on:
-            - database
+        # depends_on:
+        #     - database
 
     user-cli:
         build: ./user-cli
         environment:
             MICRO_REGISTRY: "mdns"
 
+    email-service:
+        build: ./email-service
+        network_mode: "host"
+        environment: 
+            MICRO_REGISTRY: "mdns"
+            MICRO_BROKER: "nats"
+            MICRO_BROKER_ADDRESS: "0.0.0.0:4222"
+    
+    nats:
+        image: nats
+        ports:
+            - "4222:4222"
+
     datastore:
         image: mongo
         ports: 
-            - 27017:27017
-        container_name: mongo
+            - "27017:27017"
 
     database:
         image: postgres
         ports: 
-            - 5432:5432
+            - "5432:5432"
         environment: 
             POSTGRES_DB: "userServiceDB"
             POSTGRES_USER: "userService"
             POSTGRES_PASSWORD: "12345"
-        container_name: postgres

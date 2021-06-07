@@ -3,15 +3,21 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
 	pb "shippy/user-service/proto/user"
 
+	"github.com/micro/go-micro"
+	_ "github.com/micro/go-micro/broker/nats"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type handler struct {
 	repo         Repository
 	tokenService Authable
+	Publisher    micro.Publisher
 }
+
+const topic = "user.created" // NATS的topic
 
 func (h *handler) Create(ctx context.Context, req *pb.User, resp *pb.Response) error {
 	// 哈希处理用户输入的密码,定义默认的cost
@@ -26,6 +32,12 @@ func (h *handler) Create(ctx context.Context, req *pb.User, resp *pb.Response) e
 		return nil
 	}
 	resp.User = req
+
+	// 用户注册成功后发布消息，从而建立和email-service的响应
+	log.Printf("Called by user-cli to Create user success, now publish event to notify email")
+	if err := h.Publisher.Publish(ctx, req); err != nil {
+		return err
+	}
 	return nil
 }
 
