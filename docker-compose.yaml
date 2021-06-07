@@ -34,9 +34,8 @@ services:
 
     user-service:
         build: ./user-service
-        network_mode: "host"
-        # ports:
-        #     - 50053:50051
+        ports:
+            - 50053:50051
         environment:
             MICRO_ADRESS: ":50051"
             MICRO_BROKER: "nats"
@@ -47,8 +46,8 @@ services:
             DB_PORT: "5432"
             DB_USER: "userService"
             DB_PASSWORD: "12345"
-        # depends_on:
-        #     - database
+        depends_on:
+            - database
 
     user-cli:
         build: ./user-cli
@@ -74,10 +73,11 @@ services:
             - "27017:27017"
 
     database:
-        image: postgres
+        image: mysql
         ports: 
-            - "5432:5432"
+            - "3306:3306"
         environment: 
-            POSTGRES_DB: "userServiceDB"
-            POSTGRES_USER: "userService"
-            POSTGRES_PASSWORD: "12345"
+            MYSQL_ROOT_PASSWORD: "66666"
+            MYSQL_USER: "userService"
+            MYSQL_PASSWORD: "12345"
+            MYSQL_DATABASE: "userServiceDB"

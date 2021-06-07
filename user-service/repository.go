@@ -25,7 +25,7 @@ func (repo *UserRepository) Get(id string) (*pb.User, error) {
 	if err := repo.db.First(&u).Error; err != nil {
 		return nil, err
 	}
-	log.Printf("Postgres找到用户:%+v\n!", *u)
+	log.Printf("MySQL找到用户:%+v\n!", *u)
 	return u, nil
 }
 
@@ -35,7 +35,7 @@ func (repo *UserRepository) GetAll() ([]*pb.User, error) {
 	if err := repo.db.Find(&users).Error; err != nil {
 		return nil, err
 	}
-	log.Printf("Postgres找到用户如下：\n")
+	log.Printf("MySQL找到用户如下：\n")
 	for _, v := range users {
 		log.Printf("用户: %+v\n", *v)
 	}
@@ -47,7 +47,7 @@ func (repo *UserRepository) Create(u *pb.User) error {
 	if err := repo.db.Create(&u).Error; err != nil {
 		return err
 	}
-	log.Printf("Postgres数据库用户%+v创建成功！", *u)
+	log.Printf("MySQL数据库用户%+v创建成功！", *u)
 	return nil
 }
 

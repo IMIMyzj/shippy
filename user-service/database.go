@@ -5,22 +5,24 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func CreateConnection() (*gorm.DB, error) {
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 
-	fmt.Printf("Host:%s\tport:%s\tUser:%s\tPassword:%s\tDbName:%s\n", host, port, user, password, dbName)
-	return gorm.Open(
-		"postgres",
+	fmt.Printf("%s:%s@(%s:%s)/%s\n", user, password, host, port, dbName)
+	db, err := gorm.Open(
+		"mysql",
 		fmt.Sprintf(
-			"host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
-			host, port, user, dbName, password,
+			"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+			user, password, host, port, dbName,
 		),
 	)
+	db.SingularTable(true)
+	return db, err
 }
